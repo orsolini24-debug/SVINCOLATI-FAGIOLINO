@@ -1,0 +1,395 @@
+<!doctype html>
+<html lang="it">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Svincolati Fagiolino</title>
+  <style>
+    :root{
+      --bg:#0b1020;
+      --panel:rgba(255,255,255,0.08);
+      --line:rgba(255,255,255,0.12);
+      --text:rgba(255,255,255,0.92);
+      --muted:rgba(255,255,255,0.68);
+      --brand1:#2f78ff;
+      --brand2:#53d1ff;
+      --good:#3ddc97;
+      --warn:#ffd166;
+      --bad:#ff5c7a;
+      --shadow:0 12px 30px rgba(0,0,0,0.35);
+      --radius:16px;
+      --font:ui-sans-serif,system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial;
+    }
+    *{box-sizing:border-box;}
+    body{
+      margin:0;
+      font-family:var(--font);
+      background:
+        radial-gradient(1200px 600px at 20% -10%, rgba(47,120,255,0.35), transparent 55%),
+        radial-gradient(900px 500px at 90% 0%, rgba(83,209,255,0.22), transparent 60%),
+        linear-gradient(180deg, #070a14 0%, var(--bg) 50%, #060814 100%);
+      color:var(--text);
+    }
+    header{
+      position:sticky; top:0; z-index:20;
+      backdrop-filter:blur(10px);
+      background:linear-gradient(90deg, rgba(47,120,255,0.35), rgba(83,209,255,0.18));
+      border-bottom:1px solid var(--line);
+    }
+    .wrap{max-width:1200px; margin:0 auto; padding:18px;}
+    .titleRow{display:flex; align-items:center; justify-content:space-between; gap:16px;}
+    h1{margin:0; font-size:22px; letter-spacing:0.2px;}
+    .pill{
+      padding:6px 10px; border:1px solid var(--line);
+      background:rgba(0,0,0,0.18);
+      border-radius:999px; color:var(--muted); font-size:12px;
+      display:inline-flex; align-items:center; gap:8px; white-space:nowrap;
+    }
+    .grid{display:grid; grid-template-columns:1fr; gap:12px; margin-top:14px;}
+    .panel{
+      background:var(--panel); border:1px solid var(--line);
+      border-radius:var(--radius); box-shadow:var(--shadow); padding:14px;
+    }
+    .controls{
+      display:grid; grid-template-columns:1.4fr 1fr 1fr auto;
+      gap:10px; align-items:end;
+    }
+    @media (max-width:980px){ .controls{grid-template-columns:1fr;} }
+    label{display:block; font-size:12px; color:var(--muted); margin-bottom:6px;}
+    input[type="text"], input[type="number"]{
+      width:100%; padding:10px 12px; border-radius:12px;
+      border:1px solid var(--line); background:rgba(0,0,0,0.22);
+      color:var(--text); outline:none;
+    }
+    .row{display:grid; grid-template-columns:1fr 1fr; gap:10px;}
+    .roleChips{display:flex; gap:8px; flex-wrap:wrap; padding-top:2px;}
+    .chip{
+      border:1px solid var(--line); background:rgba(0,0,0,0.18);
+      color:var(--muted); padding:8px 10px; border-radius:999px;
+      cursor:pointer; user-select:none; font-size:12px; transition:120ms ease;
+    }
+    .chip[data-on="true"]{
+      color:var(--text);
+      border-color:rgba(83,209,255,0.55);
+      background:rgba(83,209,255,0.12);
+    }
+    .btn{
+      padding:10px 12px; border-radius:12px;
+      border:1px solid var(--line); background:rgba(0,0,0,0.22);
+      color:var(--text); cursor:pointer; transition:120ms ease; white-space:nowrap;
+    }
+    .btn:hover{border-color:rgba(83,209,255,0.6);}
+    .meta{
+      display:flex; align-items:center; justify-content:space-between; gap:10px;
+      margin-top:10px; color:var(--muted); font-size:12px;
+    }
+    .tableWrap{
+      overflow:auto; border-radius:var(--radius); border:1px solid var(--line);
+      background:rgba(0,0,0,0.18);
+    }
+    table{width:100%; border-collapse:collapse; min-width:820px;}
+    thead th{
+      position:sticky; top:0;
+      background:rgba(10,14,30,0.95);
+      border-bottom:1px solid var(--line);
+      text-align:left; font-size:12px; color:var(--muted);
+      padding:10px 10px; cursor:pointer; user-select:none;
+    }
+    tbody td{
+      border-bottom:1px solid rgba(255,255,255,0.06);
+      padding:10px 10px; font-size:13px;
+    }
+    tbody tr:hover{background:rgba(83,209,255,0.06);}
+    .roleBadge{
+      width:22px; height:22px; display:inline-flex; align-items:center; justify-content:center;
+      border-radius:999px; font-weight:700; font-size:12px; border:1px solid var(--line);
+    }
+    .role-P{background:rgba(255,209,102,0.14); color:#ffd166; border-color:rgba(255,209,102,0.35);}
+    .role-D{background:rgba(61,220,151,0.14); color:#3ddc97; border-color:rgba(61,220,151,0.35);}
+    .role-C{background:rgba(83,209,255,0.14); color:#53d1ff; border-color:rgba(83,209,255,0.35);}
+    .role-A{background:rgba(255,92,122,0.14); color:#ff5c7a; border-color:rgba(255,92,122,0.35);}
+    .num{text-align:right; font-variant-numeric:tabular-nums;}
+    .nameCell{display:flex; flex-direction:column; gap:2px; line-height:1.15;}
+    .nameCell .sub{font-size:12px; color:var(--muted);}
+    .sortHint{opacity:0.65; margin-left:6px; font-size:11px;}
+  </style>
+</head>
+
+<body>
+  <header>
+    <div class="wrap">
+      <div class="titleRow">
+        <h1>Svincolati Fagiolino</h1>
+        <div class="pill" title="Dataset caricato dal file Excel che mi hai fornito">
+          <span>Dataset:</span>
+          <strong id="datasetCount">0</strong>
+          <span>giocatori</span>
+        </div>
+      </div>
+
+      <div class="grid">
+        <div class="panel">
+          <div class="controls">
+            <div>
+              <label for="q">Cerca (nome o squadra)</label>
+              <input id="q" type="text" placeholder="Es. Lookman, Inter, Roma..." />
+            </div>
+
+            <div>
+              <label>Filtro PGv (min/max)</label>
+              <div class="row">
+                <input id="pgvMin" type="number" min="0" step="1" placeholder="0" />
+                <input id="pgvMax" type="number" min="0" step="1" placeholder="999" />
+              </div>
+            </div>
+
+            <div>
+              <label>Filtro MV (min/max)</label>
+              <div class="row">
+                <input id="mvMin" type="number" step="0.01" placeholder="0.00" />
+                <input id="mvMax" type="number" step="0.01" placeholder="10.00" />
+              </div>
+            </div>
+
+            <div style="display:flex; gap:10px; justify-content:flex-end; align-items:end;">
+              <button class="btn" id="resetBtn">Reset</button>
+              <button class="btn" id="downloadBtn" title="Scarica la lista filtrata in CSV">Scarica CSV</button>
+            </div>
+
+            <div style="grid-column: 1 / -1;">
+              <label>Ruolo</label>
+              <div class="roleChips" id="roleChips">
+                <div class="chip" data-role="P" data-on="true">P</div>
+                <div class="chip" data-role="D" data-on="true">D</div>
+                <div class="chip" data-role="C" data-on="true">C</div>
+                <div class="chip" data-role="A" data-on="true">A</div>
+              </div>
+            </div>
+          </div>
+
+          <div class="meta">
+            <div>Mostrati: <strong id="shownCount">0</strong></div>
+            <div>Ordinamento: <strong id="sortState">Nessuno</strong></div>
+          </div>
+        </div>
+
+        <div class="panel">
+          <div class="tableWrap">
+            <table id="tbl">
+              <thead>
+                <tr>
+                  <th data-key="ruolo">R<span class="sortHint" id="h_ruolo"></span></th>
+                  <th data-key="nome">Nome<span class="sortHint" id="h_nome"></span></th>
+                  <th data-key="pgv" style="text-align:right;">PGv<span class="sortHint" id="h_pgv"></span></th>
+                  <th data-key="mv" style="text-align:right;">MV<span class="sortHint" id="h_mv"></span></th>
+                  <th data-key="fm" style="text-align:right;">FM<span class="sortHint" id="h_fm"></span></th>
+                </tr>
+              </thead>
+              <tbody id="tbody"></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <script>
+    const DATA = [{"nome": "Ahanor", "squadra": "Atalanta", "ruolo": "D", "pgv": 14, "mv": 5.79, "fm": 5.71}, {"nome": "Bernasconi", "squadra": "Atalanta", "ruolo": "D", "pgv": 12, "mv": 6.17, "fm": 6.21}, {"nome": "Djimsiti", "squadra": "Atalanta", "ruolo": "D", "pgv": 20, "mv": 5.8, "fm": 5.78}, {"nome": "Kolasinac", "squadra": "Atalanta", "ruolo": "D", "pgv": 5, "mv": 6.2, "fm": 6.1}, {"nome": "Musah", "squadra": "Atalanta", "ruolo": "C", "pgv": 11, "mv": 5.95, "fm": 5.91}, {"nome": "Raspadori", "squadra": "Atalanta", "ruolo": "A", "pgv": 2, "mv": 6.25, "fm": 7.75}, {"nome": "Rossi F.", "squadra": "Atalanta", "ruolo": "P", "pgv": 0, "mv": 0.0, "fm": 0.0}, {"nome": "Samardzic", "squadra": "Atalanta", "ruolo": "C", "pgv": 12, "mv": 5.96, "fm": 6.33}, {"nome": "Sportiello", "squadra": "Atalanta", "ruolo": "P", "pgv": 0, "mv": 0.0, "fm": 0.0}, {"nome": "Sulemana K.", "squadra": "Atalanta", "ruolo": "A", "pgv": 13, "mv": 6.04, "fm": 6.46}, {"nome": "Bernardeschi", "squadra": "Bologna", "ruolo": "C", "pgv": 11, "mv": 5.82, "fm": 6.0}, {"nome": "Cambiaghi", "squadra": "Bologna", "ruolo": "A", "pgv": 18, "mv": 6.06, "fm": 6.64}, {"nome": "Casale", "squadra": "Bologna", "ruolo": "D", "pgv": 7, "mv": 5.64, "fm": 5.64}, {"nome": "Dallinga", "squadra": "Bologna", "ruolo": "A", "pgv": 14, "mv": 5.79, "fm": 6.04}, {"nome": "De Silvestri", "squadra": "Bologna", "ruolo": "D", "pgv": 5, "mv": 6.1, "fm": 5.9}, {"nome": "Dominguez B.", "squadra": "Bologna", "ruolo": "A", "pgv": 9, "mv": 5.89, "fm": 6.17}, {"nome": "Ferguson", "squadra": "Bologna", "ruolo": "C", "pgv": 14, "mv": 5.96, "fm": 6.07}, {"nome": "Heggem", "squadra": "Bologna", "ruolo": "D", "pgv": 19, "mv": 5.92, "fm": 5.87}, {"nome": "Helland", "squadra": "Bologna", "ruolo": "D", "pgv": 0, "mv": 0.0, "fm": 0.0}, {"nome": "Joao Mario", "squadra": "Bologna", "ruolo": "D", "pgv": 4, "mv": 5.75, "fm": 5.88}, {"nome": "Lykogiannis", "squadra": "Bologna", "ruolo": "D", "pgv": 7, "mv": 5.71, "fm": 5.64}, {"nome": "Moro N.", "squadra": "Bologna", "ruolo": "C", "pgv": 15, "mv": 5.9, "fm": 6.07}, {"nome": "Pessina Mas.", "squadra": "Bologna", "ruolo": "P", "pgv": 1, "mv": 6.0, "fm": 6.0}, {"nome": "Pobega", "squadra": "Bologna", "ruolo": "C", "pgv": 16, "mv": 5.88, "fm": 6.28}, {"nome": "Sohm", "squadra": "Bologna", "ruolo": "C", "pgv": 14, "mv": 5.61, "fm": 5.61}, {"nome": "Zortea", "squadra": "Bologna", "ruolo": "D", "pgv": 16, "mv": 5.84, "fm": 5.88}, {"nome": "Adopo", "squadra": "Cagliari", "ruolo": "C", "pgv": 23, "mv": 5.76, "fm": 5.85}, {"nome": "Albarracin", "squadra": "Cagliari", "ruolo": "A", "pgv": 0, "mv": 0.0, "fm": 0.0}, {"nome": "Belotti", "squadra": "Cagliari", "ruolo": "A", "pgv": 3, "mv": 6.33, "fm": 8.33}, {"nome": "Borrelli", "squadra": "Cagliari", "ruolo": "A", "pgv": 21, "mv": 5.95, "fm": 6.36}, {"nome": "Ciocci", "squadra": "Cagliari", "ruolo": "P", "pgv": 0, "mv": 0.0, "fm": 0.0}, {"nome": "Deiola", "squadra": "Cagliari", "ruolo": "C", "pgv": 12, "mv": 6.04, "fm": 6.0}, {"nome": "Dossena", "squadra": "Cagliari", "ruolo": "D", "pgv": 0, "mv": 0.0, "fm": 0.0}, {"nome": "Felici", "squadra": "Cagliari", "ruolo": "C", "pgv": 11, "mv": 6.05, "fm": 6.55}, {"nome": "Gaetano", "squadra": "Cagliari", "ruolo": "C", "pgv": 21, "mv": 6.05, "fm": 6.4}, {"nome": "Idrissi R.", "squadra": "Cagliari", "ruolo": "D", "pgv": 14, "mv": 5.93, "fm": 6.29}, {"nome": "Kilicsoy", "squadra": "Cagliari", "ruolo": "A", "pgv": 10, "mv": 6.4, "fm": 7.6}, {"nome": "Liteta", "squadra": "Cagliari", "ruolo": "C", "pgv": 2, "mv": 5.75, "fm": 5.75}, {"nome": "Luvumbo", "squadra": "Cagliari", "ruolo": "A", "pgv": 10, "mv": 5.8, "fm": 5.8}, {"nome": "Mazzitelli", "squadra": "Cagliari", "ruolo": "C", "pgv": 9, "mv": 6.33, "fm": 7.11}, {"nome": "Obert", "squadra": "Cagliari", "ruolo": "D", "pgv": 20, "mv": 5.85, "fm": 5.78}, {"nome": "Palestra", "squadra": "Cagliari", "ruolo": "D", "pgv": 22, "mv": 6.43, "fm": 6.73}, {"nome": "Pavoletti", "squadra": "Cagliari", "ruolo": "A", "pgv": 3, "mv": 6.0, "fm": 5.83}, {"nome": "Raterink", "squadra": "Cagliari", "ruolo": "D", "pgv": 0, "mv": 0.0, "fm": 0.0}, {"nome": "Rodriguez Ju.", "squadra": "Cagliari", "ruolo": "D", "pgv": 6, "mv": 5.58, "fm": 5.42}, {"nome": "Sherri", "squadra": "Cagliari", "ruolo": "P", "pgv": 0, "mv": 0.0, "fm": 0.0}, {"nome": "Sulemana I.", "squadra": "Cagliari", "ruolo": "C", "pgv": 4, "mv": 5.88, "fm": 6.5}, {"nome": "Trepy", "squadra": "Cagliari", "ruolo": "A", "pgv": 0, "mv": 0.0, "fm": 0.0}, {"nome": "Zappa", "squadra": "Cagliari", "ruolo": "D", "pgv": 19, "mv": 5.92, "fm": 6.03}, {"nome": "Zè Pedro", "squadra": "Cagliari", "ruolo": "D", "pgv": 8, "mv": 5.62, "fm": 5.56}, {"nome": "Addai", "squadra": "Como", "ruolo": "A", "pgv": 11, "mv": 6.0, "fm": 6.64}, {"nome": "Baturina", "squadra": "Como", "ruolo": "C", "pgv": 11, "mv": 6.36, "fm": 7.73}, {"nome": "Caqueret", "squadra": "Como", "ruolo": "C", "pgv": 16, "mv": 6.16, "fm": 6.44}, {"nome": "Cavlina", "squadra": "Como", "ruolo": "P", "pgv": 0, "mv": 0.0, "fm": 0.0}, {"nome": "Diego Carlos", "squadra": "Como", "ruolo": "D", "pgv": 15, "mv": 6.13, "fm": 5.97}, {"nome": "Goldaniga", "squadra": "Como", "ruolo": "D", "pgv": 0, "mv": 0.0, "fm": 0.0}, {"nome": "Kempf", "squadra": "Como", "ruolo": "D", "pgv": 15, "mv": 6.27, "fm": 6.83}, {"nome": "Lahdo", "squadra": "Como", "ruolo": "C", "pgv": 0, "mv": 0.0, "fm": 0.0}, {"nome": "Moreno Alb.", "squadra": "Como", "ruolo": "D", "pgv": 8, "mv": 6.12, "fm": 6.44}, {"nome": "Perrone", "squadra": "Como", "ruolo": "C", "pgv": 21, "mv": 6.29, "fm": 6.55}, {"nome": "Rodriguez Je.", "squadra": "Como", "ruolo": "A", "pgv": 19, "mv": 6.11, "fm": 6.29}, {"nome": "Sergi Roberto", "squadra": "Como", "ruolo": "C", "pgv": 7, "mv": 5.93, "fm": 5.79}, {"nome": "Smolcic I.", "squadra": "Como", "ruolo": "D", "pgv": 15, "mv": 5.9, "fm": 5.67}, {"nome": "Tornqvist", "squadra": "Como", "ruolo": "P", "pgv": 0, "mv": 0.0, "fm": 0.0}, {"nome": "Van Der Brempt", "squadra": "Como", "ruolo": "D", "pgv": 6, "mv": 6.0, "fm": 5.83}, {"nome": "Vigorito", "squadra": "Como", "ruolo": "P", "pgv": 0, "mv": 0.0, "fm": 0.0}, {"nome": "Audero", "squadra": "Cremonese", "ruolo": "P", "pgv": 19, "mv": 6.26, "fm": 5.16}, {"nome": "Bianchetti", "squadra": "Cremonese", "ruolo": "D", "pgv": 19, "mv": 5.79, "fm": 5.79}, {"nome": "Bonazzoli", "squadra": "Cremonese", "ruolo": "A", "pgv": 20, "mv": 6.12, "fm": 6.9}, {"nome": "Bondo", "squadra": "Cremonese", "ruolo": "C", "pgv": 20, "mv": 5.9, "fm": 5.8}, {"nome": "Ceccherini", "squadra": "Cremonese", "ruolo": "D", "pgv": 6, "mv": 5.5, "fm": 5.25}, {"nome": "Collocolo", "squadra": "Cremonese", "ruolo": "C", "pgv": 4, "mv": 6.0, "fm": 5.88}, {"nome": "Djuric", "squadra": "Cremonese", "ruolo": "A", "pgv": 2, "mv": 5.75, "fm": 5.5}, {"nome": "Faye", "squadra": "Cremonese", "ruolo": "D", "pgv": 6, "mv": 5.75, "fm": 5.67}, {"nome": "Floriani Mussolini", "squadra": "Cremonese", "ruolo": "D", "pgv": 15, "mv": 5.73, "fm": 5.67}, {"nome": "Folino", "squadra": "Cremonese", "ruolo": "D", "pgv": 6, "mv": 6.0, "fm": 6.5}, {"nome": "Grassi", "squadra": "Cremonese", "ruolo": "C", "pgv": 16, "mv": 5.72, "fm": 5.66}, {"nome": "Maleh", "squadra": "Cremonese", "ruolo": "C", "pgv": 9, "mv": 5.83, "fm": 5.72}, {"nome": "Moumbagna", "squadra": "Cremonese", "ruolo": "A", "pgv": 5, "mv": 5.6, "fm": 5.6}, {"nome": "Nava", "squadra": "Cremonese", "ruolo": "P", "pgv": 0, "mv": 0.0, "fm": 0.0}, {"nome": "Okereke", "squadra": "Cremonese", "ruolo": "A", "pgv": 2, "mv": 6.0, "fm": 6.0}, {"nome": "Payero", "squadra": "Cremonese", "ruolo": "C", "pgv": 15, "mv": 6.03, "fm": 6.03}, {"nome": "Pezzella Giu.", "squadra": "Cremonese", "ruolo": "D", "pgv": 17, "mv": 5.68, "fm": 5.56}, {"nome": "Sanabria", "squadra": "Cremonese", "ruolo": "A", "pgv": 14, "mv": 5.89, "fm": 6.11}, {"nome": "Silvestri", "squadra": "Cremonese", "ruolo": "P", "pgv": 4, "mv": 6.38, "fm": 4.62}, {"nome": "Terracciano F.", "squadra": "Cremonese", "ruolo": "D", "pgv": 22, "mv": 5.95, "fm": 6.07}, {"nome": "Thorsby", "squadra": "Cremonese", "ruolo": "C", "pgv": 12, "mv": 6.21, "fm": 6.71}, {"nome": "Zerbin", "squadra": "Cremonese", "ruolo": "C", "pgv": 17, "mv": 5.79, "fm": 5.88}, {"nome": "Brescianini", "squadra": "Fiorentina", "ruolo": "C", "pgv": 8, "mv": 6.06, "fm": 6.75}, {"nome": "Christensen O.", "squadra": "Fiorentina", "ruolo": "P", "pgv": 0, "mv": 0.0, "fm": 0.0}, {"nome": "Fabbian", "squadra": "Fiorentina", "ruolo": "C", "pgv": 14, "mv": 5.82, "fm": 6.21}, {"nome": "Fagioli", "squadra": "Fiorentina", "ruolo": "C", "pgv": 20, "mv": 5.92, "fm": 5.98}, {"nome": "Fazzini", "squadra": "Fiorentina", "ruolo": "C", "pgv": 8, "mv": 5.81, "fm": 5.81}, {"nome": "Fortini", "squadra": "Fiorentina", "ruolo": "D", "pgv": 12, "mv": 5.96, "fm": 5.96}, {"nome": "Harrison", "squadra": "Fiorentina", "ruolo": "C", "pgv": 1, "mv": 5.5, "fm": 5.5}, {"nome": "Kouadio", "squadra": "Fiorentina", "ruolo": "D", "pgv": 1, "mv": 6.0, "fm": 6.0}, {"nome": "Lamptey", "squadra": "Fiorentina", "ruolo": "D", "pgv": 1, "mv": 6.0, "fm": 6.0}, {"nome": "Lezzerini", "squadra": "Fiorentina", "ruolo": "P", "pgv": 0, "mv": 0.0, "fm": 0.0}, {"nome": "Ndour", "squadra": "Fiorentina", "ruolo": "C", "pgv": 16, "mv": 5.72, "fm": 5.88}, {"nome": "Parisi", "squadra": "Fiorentina", "ruolo": "D", "pgv": 14, "mv": 6.07, "fm": 6.0}, {"nome": "Piccoli", "squadra": "Fiorentina", "ruolo": "A", "pgv": 18, "mv": 5.72, "fm": 6.06}, {"nome": "Pongracic", "squadra": "Fiorentina", "ruolo": "D", "pgv": 21, "mv": 5.71, "fm": 5.52}, {"nome": "Ranieri L.", "squadra": "Fiorentina", "ruolo": "D", "pgv": 18, "mv": 5.81, "fm": 5.83}, {"nome": "Rugani", "squadra": "Fiorentina", "ruolo": "D", "pgv": 4, "mv": 5.88, "fm": 5.88}, {"nome": "Sabiri", "squadra": "Fiorentina", "ruolo": "C", "pgv": 1, "mv": 5.5, "fm": 5.5}, {"nome": "Solomon", "squadra": "Fiorentina", "ruolo": "A", "pgv": 5, "mv": 6.0, "fm": 6.6}, {"nome": "Amorim", "squadra": "Genoa", "ruolo": "C", "pgv": 0, "mv": 0.0, "fm": 0.0}, {"nome": "Baldanzi", "squadra": "Genoa", "ruolo": "C", "pgv": 9, "mv": 6.0, "fm": 6.22}, {"nome": "Bijlow", "squadra": "Genoa", "ruolo": "P", "pgv": 2, "mv": 6.0, "fm": 3.5}, {"nome": "Cornet", "squadra": "Genoa", "ruolo": "C", "pgv": 4, "mv": 5.12, "fm": 4.38}, {"nome": "Cuenca H.", "squadra": "Genoa", "ruolo": "C", "pgv": 0, "mv": 0.0, "fm": 0.0}, {"nome": "Ekhator", "squadra": "Genoa", "ruolo": "A", "pgv": 15, "mv": 5.93, "fm": 6.27}, {"nome": "Ekuban", "squadra": "Genoa", "ruolo": "A", "pgv": 17, "mv": 5.97, "fm": 6.38}, {"nome": "Ellertsson", "squadra": "Genoa", "ruolo": "C", "pgv": 21, "mv": 5.9, "fm": 6.07}, {"nome": "Leali", "squadra": "Genoa", "ruolo": "P", "pgv": 20, "mv": 6.15, "fm": 4.8}, {"nome": "Malinovskyi", "squadra": "Genoa", "ruolo": "C", "pgv": 21, "mv": 6.12, "fm": 6.64}, {"nome": "Marcandalli", "squadra": "Genoa", "ruolo": "D", "pgv": 16, "mv": 5.94, "fm": 5.91}, {"nome": "Masini", "squadra": "Genoa", "ruolo": "C", "pgv": 15, "mv": 5.93, "fm": 5.8}, {"nome": "Messias", "squadra": "Genoa", "ruolo": "C", "pgv": 7, "mv": 6.14, "fm": 6.57}, {"nome": "Onana J.", "squadra": "Genoa", "ruolo": "C", "pgv": 1, "mv": 5.5, "fm": 5.5}, {"nome": "Ostigard", "squadra": "Genoa", "ruolo": "D", "pgv": 17, "mv": 6.06, "fm": 6.59}, {"nome": "Otoa", "squadra": "Genoa", "ruolo": "D", "pgv": 7, "mv": 5.57, "fm": 5.21}, {"nome": "Sabelli", "squadra": "Genoa", "ruolo": "D", "pgv": 5, "mv": 5.8, "fm": 5.4}, {"nome": "Siegrist", "squadra": "Genoa", "ruolo": "P", "pgv": 0, "mv": 0.0, "fm": 0.0}, {"nome": "Sommariva", "squadra": "Genoa", "ruolo": "P", "pgv": 2, "mv": 5.75, "fm": 3.75}, {"nome": "Vitinha O.", "squadra": "Genoa", "ruolo": "A", "pgv": 19, "mv": 5.97, "fm": 6.42}, {"nome": "Zatterstrom", "squadra": "Genoa", "ruolo": "D", "pgv": 0, "mv": 0.0, "fm": 0.0}, {"nome": "Calligaris", "squadra": "Inter", "ruolo": "P", "pgv": 0, "mv": 0.0, "fm": 0.0}, {"nome": "Carlos Augusto", "squadra": "Inter", "ruolo": "D", "pgv": 16, "mv": 6.22, "fm": 6.38}, {"nome": "Darmian", "squadra": "Inter", "ruolo": "D", "pgv": 1, "mv": 6.0, "fm": 6.0}, {"nome": "De Vrij", "squadra": "Inter", "ruolo": "D", "pgv": 3, "mv": 6.17, "fm": 6.17}, {"nome": "Di Gennaro", "squadra": "Inter", "ruolo": "P", "pgv": 0, "mv": 0.0, "fm": 0.0}, {"nome": "Diouf", "squadra": "Inter", "ruolo": "C", "pgv": 3, "mv": 5.67, "fm": 5.67}, {"nome": "Esposito F.P.", "squadra": "Inter", "ruolo": "A", "pgv": 18, "mv": 6.33, "fm": 6.97}, {"nome": "Luis Henrique", "squadra": "Inter", "ruolo": "C", "pgv": 16, "mv": 5.88, "fm": 5.97}, {"nome": "Zielinski", "squadra": "Inter", "ruolo": "C", "pgv": 16, "mv": 6.44, "fm": 7.25}, {"nome": "Adzic", "squadra": "Juventus", "ruolo": "C", "pgv": 4, "mv": 6.12, "fm": 6.88}, {"nome": "Boga", "squadra": "Juventus", "ruolo": "A", "pgv": 0, "mv": 0.0, "fm": 0.0}, {"nome": "Cabal", "squadra": "Juventus", "ruolo": "D", "pgv": 7, "mv": 6.07, "fm": 6.86}, {"nome": "Gatti", "squadra": "Juventus", "ruolo": "D", "pgv": 11, "mv": 5.91, "fm": 6.05}, {"nome": "Holm", "squadra": "Juventus", "ruolo": "D", "pgv": 10, "mv": 6.1, "fm": 6.65}, {"nome": "Kelly L.", "squadra": "Juventus", "ruolo": "D", "pgv": 20, "mv": 6.02, "fm": 6.1}, {"nome": "Kostic", "squadra": "Juventus", "ruolo": "C", "pgv": 10, "mv": 6.2, "fm": 7.2}, {"nome": "McKennie", "squadra": "Juventus", "ruolo": "C", "pgv": 20, "mv": 6.18, "fm": 6.62}, {"nome": "Milik", "squadra": "Juventus", "ruolo": "A", "pgv": 0, "mv": 0.0, "fm": 0.0}, {"nome": "Miretti", "squadra": "Juventus", "ruolo": "C", "pgv": 9, "mv": 6.22, "fm": 6.61}, {"nome": "Openda", "squadra": "Juventus", "ruolo": "A", "pgv": 13, "mv": 5.85, "fm": 6.08}, {"nome": "Pinsoglio", "squadra": "Juventus", "ruolo": "P", "pgv": 0, "mv": 0.0, "fm": 0.0}, {"nome": "Zhegrova", "squadra": "Juventus", "ruolo": "C", "pgv": 7, "mv": 6.07, "fm": 6.07}, {"nome": "Basic", "squadra": "Lazio", "ruolo": "C", "pgv": 15, "mv": 6.13, "fm": 6.4}, {"nome": "Belahyane", "squadra": "Lazio", "ruolo": "C", "pgv": 8, "mv": 5.75, "fm": 5.69}, {"nome": "Cancellieri", "squadra": "Lazio", "ruolo": "A", "pgv": 16, "mv": 6.03, "fm": 6.47}, {"nome": "Cataldi", "squadra": "Lazio", "ruolo": "C", "pgv": 20, "mv": 6.1, "fm": 6.52}, {"nome": "Dele-Bashiru", "squadra": "Lazio", "ruolo": "C", "pgv": 7, "mv": 5.71, "fm": 5.71}, {"nome": "Dia", "squadra": "Lazio", "ruolo": "A", "pgv": 14, "mv": 5.57, "fm": 5.79}, {"nome": "Furlanetto", "squadra": "Lazio", "ruolo": "P", "pgv": 0, "mv": 0.0, "fm": 0.0}, {"nome": "Gigot", "squadra": "Lazio", "ruolo": "D", "pgv": 0, "mv": 0.0, "fm": 0.0}, {"nome": "Hysaj", "squadra": "Lazio", "ruolo": "D", "pgv": 2, "mv": 5.5, "fm": 5.5}, {"nome": "Lazzari", "squadra": "Lazio", "ruolo": "D", "pgv": 13, "mv": 5.81, "fm": 5.73}, {"nome": "Motta", "squadra": "Lazio", "ruolo": "P", "pgv": 0, "mv": 0.0, "fm": 0.0}, {"nome": "Noslin", "squadra": "Lazio", "ruolo": "A", "pgv": 10, "mv": 5.8, "fm": 6.3}, {"nome": "Patric", "squadra": "Lazio", "ruolo": "D", "pgv": 1, "mv": 6.0, "fm": 6.0}, {"nome": "Pedro", "squadra": "Lazio", "ruolo": "A", "pgv": 13, "mv": 6.04, "fm": 6.5}, {"nome": "Pellegrini Lu.", "squadra": "Lazio", "ruolo": "D", "pgv": 19, "mv": 5.87, "fm": 5.74}, {"nome": "Provstgaard", "squadra": "Lazio", "ruolo": "D", "pgv": 8, "mv": 6.06, "fm": 6.0}, {"nome": "Przyborek", "squadra": "Lazio", "ruolo": "C", "pgv": 0, "mv": 0.0, "fm": 0.0}, {"nome": "Ratkov", "squadra": "Lazio", "ruolo": "A", "pgv": 4, "mv": 5.62, "fm": 5.62}, {"nome": "Romagnoli", "squadra": "Lazio", "ruolo": "D", "pgv": 20, "mv": 6.05, "fm": 5.95}, {"nome": "Rovella", "squadra": "Lazio", "ruolo": "C", "pgv": 6, "mv": 5.83, "fm": 5.83}, {"nome": "Tavares N.", "squadra": "Lazio", "ruolo": "D", "pgv": 9, "mv": 5.61, "fm": 5.56}, {"nome": "Taylor K.", "squadra": "Lazio", "ruolo": "C", "pgv": 4, "mv": 5.75, "fm": 6.5}, {"nome": "Vecino", "squadra": "Lazio", "ruolo": "C", "pgv": 12, "mv": 5.92, "fm": 5.96}, {"nome": "Zaccagni", "squadra": "Lazio", "ruolo": "C", "pgv": 19, "mv": 6.0, "fm": 6.26}, {"nome": "Banda", "squadra": "Lecce", "ruolo": "A", "pgv": 18, "mv": 5.97, "fm": 6.25}, {"nome": "Berisha M.", "squadra": "Lecce", "ruolo": "C", "pgv": 12, "mv": 6.17, "fm": 6.92}, {"nome": "Cheddira", "squadra": "Lecce", "ruolo": "A", "pgv": 9, "mv": 5.78, "fm": 6.11}, {"nome": "Coulibaly L.", "squadra": "Lecce", "ruolo": "C", "pgv": 19, "mv": 6.08, "fm": 6.32}, {"nome": "Fofana Sa.", "squadra": "Lecce", "ruolo": "C", "pgv": 0, "mv": 0.0, "fm": 0.0}, {"nome": "Fruchtl", "squadra": "Lecce", "ruolo": "P", "pgv": 0, "mv": 0.0, "fm": 0.0}, {"nome": "Gallo", "squadra": "Lecce", "ruolo": "D", "pgv": 23, "mv": 5.93, "fm": 5.89}, {"nome": "Gandelman", "squadra": "Lecce", "ruolo": "C", "pgv": 4, "mv": 5.88, "fm": 5.88}, {"nome": "Gaspar K.", "squadra": "Lecce", "ruolo": "D", "pgv": 19, "mv": 5.84, "fm": 5.63}, {"nome": "Gorter", "squadra": "Lecce", "ruolo": "C", "pgv": 1, "mv": 5.5, "fm": 5.5}, {"nome": "Helgason", "squadra": "Lecce", "ruolo": "C", "pgv": 3, "mv": 5.5, "fm": 5.5}, {"nome": "Jean", "squadra": "Lecce", "ruolo": "D", "pgv": 0, "mv": 0.0, "fm": 0.0}, {"nome": "Marchwinski", "squadra": "Lecce", "ruolo": "C", "pgv": 0, "mv": 0.0, "fm": 0.0}, {"nome": "Ndaba", "squadra": "Lecce", "ruolo": "D", "pgv": 6, "mv": 5.83, "fm": 5.83}, {"nome": "N'Dri", "squadra": "Lecce", "ruolo": "A", "pgv": 9, "mv": 6.0, "fm": 6.56}, {"nome": "Ngom", "squadra": "Lecce", "ruolo": "C", "pgv": 0, "mv": 0.0, "fm": 0.0}, {"nome": "Perez M.", "squadra": "Lecce", "ruolo": "D", "pgv": 1, "mv": 5.0, "fm": 5.0}, {"nome": "Pierotti", "squadra": "Lecce", "ruolo": "C", "pgv": 22, "mv": 5.77, "fm": 5.75}, {"nome": "Ramadani", "squadra": "Lecce", "ruolo": "C", "pgv": 22, "mv": 5.84, "fm": 5.68}, {"nome": "Sala A.", "squadra": "Lecce", "ruolo": "C", "pgv": 4, "mv": 5.75, "fm": 6.0}, {"nome": "Samooja", "squadra": "Lecce", "ruolo": "P", "pgv": 0, "mv": 0.0, "fm": 0.0}, {"nome": "Siebert", "squadra": "Lecce", "ruolo": "D", "pgv": 6, "mv": 5.5, "fm": 5.5}, {"nome": "Sottil", "squadra": "Lecce", "ruolo": "C", "pgv": 17, "mv": 6.03, "fm": 6.24}, {"nome": "Tiago Gabriel", "squadra": "Lecce", "ruolo": "D", "pgv": 22, "mv": 5.93, "fm": 5.91}, {"nome": "Veiga D.", "squadra": "Lecce", "ruolo": "D", "pgv": 21, "mv": 5.81, "fm": 5.67}, {"nome": "Athekame", "squadra": "Milan", "ruolo": "D", "pgv": 5, "mv": 5.8, "fm": 6.1}, {"nome": "Balentien", "squadra": "Milan", "ruolo": "A", "pgv": 0, "mv": 0.0, "fm": 0.0}, {"nome": "Bartesaghi", "squadra": "Milan", "ruolo": "D", "pgv": 17, "mv": 6.06, "fm": 6.38}, {"nome": "De Winter", "squadra": "Milan", "ruolo": "D", "pgv": 13, "mv": 5.88, "fm": 6.08}, {"nome": "Estupinan", "squadra": "Milan", "ruolo": "D", "pgv": 9, "mv": 5.67, "fm": 5.56}, {"nome": "Fofana Y.", "squadra": "Milan", "ruolo": "C", "pgv": 18, "mv": 5.89, "fm": 6.06}, {"nome": "Fullkrug", "squadra": "Milan", "ruolo": "A", "pgv": 5, "mv": 6.1, "fm": 6.7}, {"nome": "Jashari", "squadra": "Milan", "ruolo": "C", "pgv": 4, "mv": 5.88, "fm": 5.88}, {"nome": "Loftus-Cheek", "squadra": "Milan", "ruolo": "C", "pgv": 17, "mv": 6.09, "fm": 6.29}, {"nome": "Nkunku", "squadra": "Milan", "ruolo": "A", "pgv": 14, "mv": 5.96, "fm": 6.96}, {"nome": "Odogu", "squadra": "Milan", "ruolo": "D", "pgv": 0, "mv": 0.0, "fm": 0.0}, {"nome": "Ricci S.", "squadra": "Milan", "ruolo": "C", "pgv": 16, "mv": 6.12, "fm": 6.38}, {"nome": "Torriani", "squadra": "Milan", "ruolo": "P", "pgv": 0, "mv": 0.0, "fm": 0.0}, {"nome": "Beukema", "squadra": "Napoli", "ruolo": "D", "pgv": 11, "mv": 5.86, "fm": 6.05}, {"nome": "Contini", "squadra": "Napoli", "ruolo": "P", "pgv": 0, "mv": 0.0, "fm": 0.0}, {"nome": "De Bruyne", "squadra": "Napoli", "ruolo": "C", "pgv": 8, "mv": 6.38, "fm": 7.81}, {"nome": "Di Lorenzo", "squadra": "Napoli", "ruolo": "D", "pgv": 23, "mv": 6.07, "fm": 6.22}, {"nome": "Elmas", "squadra": "Napoli", "ruolo": "C", "pgv": 18, "mv": 5.69, "fm": 5.72}, {"nome": "Ferrante", "squadra": "Napoli", "ruolo": "P", "pgv": 0, "mv": 0.0, "fm": 0.0}, {"nome": "Gilmour", "squadra": "Napoli", "ruolo": "C", "pgv": 6, "mv": 6.0, "fm": 6.42}, {"nome": "Giovane", "squadra": "Napoli", "ruolo": "A", "pgv": 22, "mv": 6.02, "fm": 6.57}, {"nome": "Gutierrez", "squadra": "Napoli", "ruolo": "D", "pgv": 8, "mv": 5.94, "fm": 6.31}, {"nome": "Juan Jesus", "squadra": "Napoli", "ruolo": "D", "pgv": 14, "mv": 5.86, "fm": 5.64}, {"nome": "Lukaku", "squadra": "Napoli", "ruolo": "A", "pgv": 0, "mv": 0.0, "fm": 0.0}, {"nome": "Mazzocchi", "squadra": "Napoli", "ruolo": "D", "pgv": 4, "mv": 5.75, "fm": 5.5}, {"nome": "Neres", "squadra": "Napoli", "ruolo": "C", "pgv": 16, "mv": 6.19, "fm": 6.84}, {"nome": "Santos A.", "squadra": "Napoli", "ruolo": "C", "pgv": 0, "mv": 0.0, "fm": 0.0}, {"nome": "Spinazzola", "squadra": "Napoli", "ruolo": "D", "pgv": 18, "mv": 6.33, "fm": 6.81}, {"nome": "Vergara", "squadra": "Napoli", "ruolo": "C", "pgv": 3, "mv": 6.5, "fm": 7.33}, {"nome": "Almqvist", "squadra": "Parma", "ruolo": "A", "pgv": 8, "mv": 5.88, "fm": 5.88}, {"nome": "Benedyczak", "squadra": "Parma", "ruolo": "A", "pgv": 10, "mv": 5.95, "fm": 6.3}, {"nome": "Britschgi", "squadra": "Parma", "ruolo": "D", "pgv": 18, "mv": 5.83, "fm": 5.86}, {"nome": "Carboni F.", "squadra": "Parma", "ruolo": "D", "pgv": 0, "mv": 0.0, "fm": 0.0}, {"nome": "Circati", "squadra": "Parma", "ruolo": "D", "pgv": 18, "mv": 6.03, "fm": 6.08}, {"nome": "Corvi", "squadra": "Parma", "ruolo": "P", "pgv": 11, "mv": 6.0, "fm": 4.5}, {"nome": "Cremaschi", "squadra": "Parma", "ruolo": "C", "pgv": 0, "mv": 0.0, "fm": 0.0}, {"nome": "Delprato", "squadra": "Parma", "ruolo": "D", "pgv": 22, "mv": 5.89, "fm": 5.93}, {"nome": "Elphege", "squadra": "Parma", "ruolo": "A", "pgv": 0, "mv": 0.0, "fm": 0.0}, {"nome": "Estevez", "squadra": "Parma", "ruolo": "C", "pgv": 14, "mv": 5.79, "fm": 5.71}, {"nome": "Frigan", "squadra": "Parma", "ruolo": "A", "pgv": 0, "mv": 0.0, "fm": 0.0}, {"nome": "Keita M.", "squadra": "Parma", "ruolo": "C", "pgv": 21, "mv": 5.93, "fm": 5.9}, {"nome": "Ndiaye", "squadra": "Parma", "ruolo": "D", "pgv": 7, "mv": 5.36, "fm": 5.07}, {"nome": "Nicolussi Caviglia", "squadra": "Parma", "ruolo": "C", "pgv": 9, "mv": 5.61, "fm": 5.61}, {"nome": "Ondrejka", "squadra": "Parma", "ruolo": "C", "pgv": 11, "mv": 5.64, "fm": 5.59}, {"nome": "Ordonez C.", "squadra": "Parma", "ruolo": "C", "pgv": 9, "mv": 5.61, "fm": 5.39}, {"nome": "Oristanio", "squadra": "Parma", "ruolo": "C", "pgv": 12, "mv": 5.71, "fm": 5.67}, {"nome": "Rinaldi", "squadra": "Parma", "ruolo": "P", "pgv": 1, "mv": 7.0, "fm": 6.5}, {"nome": "Sorensen O.", "squadra": "Parma", "ruolo": "C", "pgv": 20, "mv": 5.8, "fm": 5.9}, {"nome": "Strefezza", "squadra": "Parma", "ruolo": "C", "pgv": 0, "mv": 0.0, "fm": 0.0}, {"nome": "Troilo", "squadra": "Parma", "ruolo": "D", "pgv": 8, "mv": 5.56, "fm": 5.31}, {"nome": "Valenti", "squadra": "Parma", "ruolo": "D", "pgv": 17, "mv": 5.94, "fm": 5.85}, {"nome": "Aebischer", "squadra": "Pisa", "ruolo": "C", "pgv": 22, "mv": 5.84, "fm": 5.89}, {"nome": "Akinsanmiro", "squadra": "Pisa", "ruolo": "C", "pgv": 13, "mv": 6.0, "fm": 6.0}, {"nome": "Albiol", "squadra": "Pisa", "ruolo": "D", "pgv": 6, "mv": 5.83, "fm": 5.75}, {"nome": "Angori", "squadra": "Pisa", "ruolo": "D", "pgv": 20, "mv": 5.98, "fm": 6.0}, {"nome": "Bozhinov", "squadra": "Pisa", "ruolo": "D", "pgv": 1, "mv": 5.0, "fm": 4.5}, {"nome": "Calabresi", "squadra": "Pisa", "ruolo": "D", "pgv": 15, "mv": 5.83, "fm": 5.67}, {"nome": "Canestrelli", "squadra": "Pisa", "ruolo": "D", "pgv": 23, "mv": 5.72, "fm": 5.67}, {"nome": "Caracciolo A.", "squadra": "Pisa", "ruolo": "D", "pgv": 21, "mv": 5.86, "fm": 5.64}, {"nome": "Coppola F.", "squadra": "Pisa", "ruolo": "D", "pgv": 3, "mv": 5.0, "fm": 4.67}, {"nome": "Cuadrado", "squadra": "Pisa", "ruolo": "D", "pgv": 9, "mv": 6.11, "fm": 6.33}, {"nome": "Denoon", "squadra": "Pisa", "ruolo": "D", "pgv": 2, "mv": 5.5, "fm": 5.25}, {"nome": "Durosinmi", "squadra": "Pisa", "ruolo": "A", "pgv": 3, "mv": 6.33, "fm": 7.67}, {"nome": "Hojholt", "squadra": "Pisa", "ruolo": "C", "pgv": 6, "mv": 5.67, "fm": 5.58}, {"nome": "Iling Junior", "squadra": "Pisa", "ruolo": "C", "pgv": 0, "mv": 0.0, "fm": 0.0}, {"nome": "Leris", "squadra": "Pisa", "ruolo": "C", "pgv": 20, "mv": 6.02, "fm": 6.3}, {"nome": "Lorran", "squadra": "Pisa", "ruolo": "C", "pgv": 4, "mv": 5.88, "fm": 6.62}, {"nome": "Loyola", "squadra": "Pisa", "ruolo": "C", "pgv": 1, "mv": 5.5, "fm": 5.5}, {"nome": "Marin M.", "squadra": "Pisa", "ruolo": "C", "pgv": 16, "mv": 5.84, "fm": 5.72}, {"nome": "Meister", "squadra": "Pisa", "ruolo": "A", "pgv": 18, "mv": 5.75, "fm": 6.06}, {"nome": "Moreo", "squadra": "Pisa", "ruolo": "A", "pgv": 20, "mv": 6.08, "fm": 6.8}, {"nome": "Nicolas", "squadra": "Pisa", "ruolo": "P", "pgv": 0, "mv": 0.0, "fm": 0.0}, {"nome": "Piccinini G.", "squadra": "Pisa", "ruolo": "C", "pgv": 12, "mv": 5.92, "fm": 5.83}, {"nome": "Scuffet", "squadra": "Pisa", "ruolo": "P", "pgv": 6, "mv": 6.25, "fm": 3.75}, {"nome": "Semper", "squadra": "Pisa", "ruolo": "P", "pgv": 17, "mv": 6.18, "fm": 4.71}, {"nome": "Stengs", "squadra": "Pisa", "ruolo": "C", "pgv": 0, "mv": 0.0, "fm": 0.0}, {"nome": "Stojilkovic", "squadra": "Pisa", "ruolo": "A", "pgv": 1, "mv": 5.5, "fm": 5.5}, {"nome": "Vural", "squadra": "Pisa", "ruolo": "C", "pgv": 8, "mv": 5.81, "fm": 5.62}, {"nome": "Angelino", "squadra": "Roma", "ruolo": "D", "pgv": 5, "mv": 5.8, "fm": 5.7}, {"nome": "Arena A.", "squadra": "Roma", "ruolo": "A", "pgv": 0, "mv": 0.0, "fm": 0.0}, {"nome": "Celik", "squadra": "Roma", "ruolo": "D", "pgv": 17, "mv": 6.21, "fm": 6.35}, {"nome": "Dovbyk", "squadra": "Roma", "ruolo": "A", "pgv": 12, "mv": 6.0, "fm": 6.83}, {"nome": "El Aynaoui", "squadra": "Roma", "ruolo": "C", "pgv": 9, "mv": 6.0, "fm": 6.0}, {"nome": "El Shaarawy", "squadra": "Roma", "ruolo": "C", "pgv": 11, "mv": 6.09, "fm": 6.23}, {"nome": "Ferguson E.", "squadra": "Roma", "ruolo": "A", "pgv": 14, "mv": 6.11, "fm": 6.86}, {"nome": "Ghilardi", "squadra": "Roma", "ruolo": "D", "pgv": 6, "mv": 5.92, "fm": 5.92}, {"nome": "Gollini", "squadra": "Roma", "ruolo": "P", "pgv": 0, "mv": 0.0, "fm": 0.0}, {"nome": "Hermoso", "squadra": "Roma", "ruolo": "D", "pgv": 16, "mv": 6.16, "fm": 6.16}, {"nome": "Malen", "squadra": "Roma", "ruolo": "A", "pgv": 2, "mv": 6.5, "fm": 8.0}, {"nome": "Pellegrini Lo.", "squadra": "Roma", "ruolo": "C", "pgv": 14, "mv": 6.14, "fm": 6.75}, {"nome": "Pisilli", "squadra": "Roma", "ruolo": "C", "pgv": 7, "mv": 6.07, "fm": 6.21}, {"nome": "Rensch", "squadra": "Roma", "ruolo": "D", "pgv": 8, "mv": 6.06, "fm": 6.19}, {"nome": "Tsimikas", "squadra": "Roma", "ruolo": "D", "pgv": 8, "mv": 5.81, "fm": 5.75}, {"nome": "Vaz", "squadra": "Roma", "ruolo": "A", "pgv": 2, "mv": 5.75, "fm": 5.75}, {"nome": "Venturino", "squadra": "Roma", "ruolo": "C", "pgv": 1, "mv": 6.0, "fm": 6.0}, {"nome": "Zaragoza", "squadra": "Roma", "ruolo": "C", "pgv": 0, "mv": 0.0, "fm": 0.0}, {"nome": "Ziolkowski", "squadra": "Roma", "ruolo": "D", "pgv": 7, "mv": 6.07, "fm": 5.93}, {"nome": "Bakola", "squadra": "Sassuolo", "ruolo": "C", "pgv": 0, "mv": 0.0, "fm": 0.0}, {"nome": "Boloca", "squadra": "Sassuolo", "ruolo": "C", "pgv": 2, "mv": 5.75, "fm": 5.75}, {"nome": "Candè", "squadra": "Sassuolo", "ruolo": "D", "pgv": 8, "mv": 5.69, "fm": 5.56}, {"nome": "Coulibaly W.", "squadra": "Sassuolo", "ruolo": "D", "pgv": 6, "mv": 5.42, "fm": 5.42}, {"nome": "Fadera", "squadra": "Sassuolo", "ruolo": "C", "pgv": 21, "mv": 5.9, "fm": 6.17}, {"nome": "Garcia U.", "squadra": "Sassuolo", "ruolo": "D", "pgv": 0, "mv": 0.0, "fm": 0.0}, {"nome": "Iannoni", "squadra": "Sassuolo", "ruolo": "C", "pgv": 4, "mv": 6.0, "fm": 6.62}, {"nome": "Idzes", "squadra": "Sassuolo", "ruolo": "D", "pgv": 22, "mv": 5.95, "fm": 5.93}, {"nome": "Konè I.", "squadra": "Sassuolo", "ruolo": "C", "pgv": 20, "mv": 6.2, "fm": 6.7}, {"nome": "Lipani", "squadra": "Sassuolo", "ruolo": "C", "pgv": 9, "mv": 5.83, "fm": 5.83}, {"nome": "Matic", "squadra": "Sassuolo", "ruolo": "C", "pgv": 22, "mv": 6.09, "fm": 6.18}, {"nome": "Moro L.", "squadra": "Sassuolo", "ruolo": "A", "pgv": 5, "mv": 5.7, "fm": 5.6}, {"nome": "Muharemovic", "squadra": "Sassuolo", "ruolo": "D", "pgv": 20, "mv": 5.9, "fm": 5.95}, {"nome": "Muric", "squadra": "Sassuolo", "ruolo": "P", "pgv": 22, "mv": 6.16, "fm": 4.84}, {"nome": "Pedro Felipe", "squadra": "Sassuolo", "ruolo": "D", "pgv": 0, "mv": 0.0, "fm": 0.0}, {"nome": "Pieragnolo", "squadra": "Sassuolo", "ruolo": "D", "pgv": 0, "mv": 0.0, "fm": 0.0}, {"nome": "Romagna", "squadra": "Sassuolo", "ruolo": "D", "pgv": 3, "mv": 5.5, "fm": 5.5}, {"nome": "Satalino", "squadra": "Sassuolo", "ruolo": "P", "pgv": 0, "mv": 0.0, "fm": 0.0}, {"nome": "Thorstvedt", "squadra": "Sassuolo", "ruolo": "C", "pgv": 17, "mv": 6.12, "fm": 6.35}, {"nome": "Turati", "squadra": "Sassuolo", "ruolo": "P", "pgv": 1, "mv": 5.5, "fm": 3.5}, {"nome": "Volpato", "squadra": "Sassuolo", "ruolo": "C", "pgv": 12, "mv": 6.25, "fm": 6.75}, {"nome": "Vranckx", "squadra": "Sassuolo", "ruolo": "C", "pgv": 12, "mv": 5.62, "fm": 5.54}, {"nome": "Walukiewicz", "squadra": "Sassuolo", "ruolo": "D", "pgv": 22, "mv": 5.82, "fm": 5.77}, {"nome": "Aboukhlal", "squadra": "Torino", "ruolo": "A", "pgv": 9, "mv": 5.72, "fm": 5.61}, {"nome": "Anjorin", "squadra": "Torino", "ruolo": "C", "pgv": 6, "mv": 5.67, "fm": 5.58}, {"nome": "Biraghi", "squadra": "Torino", "ruolo": "D", "pgv": 9, "mv": 5.56, "fm": 5.56}, {"nome": "Casadei", "squadra": "Torino", "ruolo": "C", "pgv": 20, "mv": 5.82, "fm": 6.0}, {"nome": "Coco", "squadra": "Torino", "ruolo": "D", "pgv": 20, "mv": 5.98, "fm": 6.12}, {"nome": "Ebosse", "squadra": "Torino", "ruolo": "D", "pgv": 3, "mv": 5.5, "fm": 5.5}, {"nome": "Gineitis", "squadra": "Torino", "ruolo": "C", "pgv": 13, "mv": 5.69, "fm": 5.69}, {"nome": "Ilic", "squadra": "Torino", "ruolo": "C", "pgv": 7, "mv": 6.0, "fm": 5.86}, {"nome": "Ilkhan", "squadra": "Torino", "ruolo": "C", "pgv": 7, "mv": 5.64, "fm": 5.57}, {"nome": "Ismajli", "squadra": "Torino", "ruolo": "D", "pgv": 15, "mv": 5.83, "fm": 5.87}, {"nome": "Israel", "squadra": "Torino", "ruolo": "P", "pgv": 9, "mv": 5.89, "fm": 3.83}, {"nome": "Kulenovic", "squadra": "Torino", "ruolo": "A", "pgv": 0, "mv": 0.0, "fm": 0.0}, {"nome": "Marianucci", "squadra": "Torino", "ruolo": "D", "pgv": 3, "mv": 5.67, "fm": 6.0}, {"nome": "Maripan", "squadra": "Torino", "ruolo": "D", "pgv": 21, "mv": 5.98, "fm": 6.1}, {"nome": "Njie", "squadra": "Torino", "ruolo": "A", "pgv": 4, "mv": 5.75, "fm": 6.75}, {"nome": "Nkounkou", "squadra": "Torino", "ruolo": "D", "pgv": 6, "mv": 5.75, "fm": 5.75}, {"nome": "Obrador", "squadra": "Torino", "ruolo": "D", "pgv": 2, "mv": 5.75, "fm": 5.75}, {"nome": "Paleari", "squadra": "Torino", "ruolo": "P", "pgv": 14, "mv": 6.14, "fm": 4.54}, {"nome": "Pedersen", "squadra": "Torino", "ruolo": "D", "pgv": 16, "mv": 5.78, "fm": 5.69}, {"nome": "Prati", "squadra": "Torino", "ruolo": "C", "pgv": 20, "mv": 5.88, "fm": 5.9}, {"nome": "Schuurs", "squadra": "Torino", "ruolo": "D", "pgv": 0, "mv": 0.0, "fm": 0.0}, {"nome": "Simeone", "squadra": "Torino", "ruolo": "A", "pgv": 17, "mv": 6.09, "fm": 6.97}, {"nome": "Tameze", "squadra": "Torino", "ruolo": "C", "pgv": 17, "mv": 5.65, "fm": 5.59}, {"nome": "Zapata D.", "squadra": "Torino", "ruolo": "A", "pgv": 13, "mv": 5.62, "fm": 5.62}, {"nome": "Arizala", "squadra": "Udinese", "ruolo": "D", "pgv": 0, "mv": 0.0, "fm": 0.0}, {"nome": "Bayo V.", "squadra": "Udinese", "ruolo": "A", "pgv": 8, "mv": 5.75, "fm": 5.88}, {"nome": "Bertola", "squadra": "Udinese", "ruolo": "D", "pgv": 17, "mv": 5.85, "fm": 5.85}, {"nome": "Buksa", "squadra": "Udinese", "ruolo": "A", "pgv": 12, "mv": 5.92, "fm": 6.12}, {"nome": "Ehizibue", "squadra": "Udinese", "ruolo": "D", "pgv": 12, "mv": 5.62, "fm": 5.54}, {"nome": "Ekkelenkamp", "squadra": "Udinese", "ruolo": "C", "pgv": 18, "mv": 5.97, "fm": 6.31}, {"nome": "Goglichidze", "squadra": "Udinese", "ruolo": "D", "pgv": 6, "mv": 5.75, "fm": 5.58}, {"nome": "Gueye", "squadra": "Udinese", "ruolo": "A", "pgv": 4, "mv": 5.62, "fm": 5.62}, {"nome": "Kabasele", "squadra": "Udinese", "ruolo": "D", "pgv": 16, "mv": 6.06, "fm": 6.34}, {"nome": "Kamara H.", "squadra": "Udinese", "ruolo": "D", "pgv": 15, "mv": 5.87, "fm": 5.83}, {"nome": "Karlstrom", "squadra": "Udinese", "ruolo": "C", "pgv": 22, "mv": 5.98, "fm": 6.02}, {"nome": "Miller L.", "squadra": "Udinese", "ruolo": "C", "pgv": 7, "mv": 5.86, "fm": 5.79}, {"nome": "Mlacic", "squadra": "Udinese", "ruolo": "D", "pgv": 0, "mv": 0.0, "fm": 0.0}, {"nome": "Nunziante", "squadra": "Udinese", "ruolo": "P", "pgv": 0, "mv": 0.0, "fm": 0.0}, {"nome": "Padelli", "squadra": "Udinese", "ruolo": "P", "pgv": 2, "mv": 6.25, "fm": 5.25}, {"nome": "Piotrowski", "squadra": "Udinese", "ruolo": "C", "pgv": 20, "mv": 5.9, "fm": 6.0}, {"nome": "Sava", "squadra": "Udinese", "ruolo": "P", "pgv": 7, "mv": 5.57, "fm": 3.5}, {"nome": "Zanoli", "squadra": "Udinese", "ruolo": "D", "pgv": 19, "mv": 6.05, "fm": 6.29}, {"nome": "Zarraga", "squadra": "Udinese", "ruolo": "C", "pgv": 4, "mv": 5.75, "fm": 5.62}, {"nome": "Zemura", "squadra": "Udinese", "ruolo": "D", "pgv": 8, "mv": 5.81, "fm": 5.75}, {"nome": "Akpa Akpro", "squadra": "Verona", "ruolo": "C", "pgv": 9, "mv": 5.89, "fm": 5.67}, {"nome": "Al-Musrati", "squadra": "Verona", "ruolo": "C", "pgv": 8, "mv": 5.69, "fm": 5.62}, {"nome": "Belghali", "squadra": "Verona", "ruolo": "D", "pgv": 15, "mv": 6.3, "fm": 6.53}, {"nome": "Bella-Kotchap", "squadra": "Verona", "ruolo": "D", "pgv": 13, "mv": 5.88, "fm": 5.77}, {"nome": "Bernede", "squadra": "Verona", "ruolo": "C", "pgv": 23, "mv": 5.85, "fm": 6.04}, {"nome": "Bowie", "squadra": "Verona", "ruolo": "A", "pgv": 0, "mv": 0.0, "fm": 0.0}, {"nome": "Bradaric", "squadra": "Verona", "ruolo": "D", "pgv": 18, "mv": 5.78, "fm": 5.72}, {"nome": "Cham", "squadra": "Verona", "ruolo": "D", "pgv": 3, "mv": 5.17, "fm": 5.17}, {"nome": "Edmundsson", "squadra": "Verona", "ruolo": "D", "pgv": 0, "mv": 0.0, "fm": 0.0}, {"nome": "Frese", "squadra": "Verona", "ruolo": "D", "pgv": 18, "mv": 5.81, "fm": 5.72}, {"nome": "Gagliardini", "squadra": "Verona", "ruolo": "C", "pgv": 18, "mv": 5.97, "fm": 5.97}, {"nome": "Harroui", "squadra": "Verona", "ruolo": "C", "pgv": 8, "mv": 5.69, "fm": 5.69}, {"nome": "Isaac", "squadra": "Verona", "ruolo": "A", "pgv": 1, "mv": 6.0, "fm": 6.0}, {"nome": "Kouamè", "squadra": "Verona", "ruolo": "A", "pgv": 1, "mv": 6.0, "fm": 6.0}, {"nome": "Lirola", "squadra": "Verona", "ruolo": "D", "pgv": 3, "mv": 5.67, "fm": 5.5}, {"nome": "Lovric", "squadra": "Verona", "ruolo": "C", "pgv": 4, "mv": 5.62, "fm": 5.75}, {"nome": "Montipò", "squadra": "Verona", "ruolo": "P", "pgv": 20, "mv": 6.15, "fm": 4.6}, {"nome": "Mosquera", "squadra": "Verona", "ruolo": "A", "pgv": 12, "mv": 5.96, "fm": 6.08}, {"nome": "Nelsson", "squadra": "Verona", "ruolo": "D", "pgv": 22, "mv": 5.59, "fm": 5.43}, {"nome": "Niasse", "squadra": "Verona", "ruolo": "C", "pgv": 13, "mv": 5.85, "fm": 5.88}, {"nome": "Orban G.", "squadra": "Verona", "ruolo": "A", "pgv": 20, "mv": 6.0, "fm": 7.0}, {"nome": "Oyegoke", "squadra": "Verona", "ruolo": "D", "pgv": 2, "mv": 5.0, "fm": 5.0}, {"nome": "Perilli", "squadra": "Verona", "ruolo": "P", "pgv": 3, "mv": 6.17, "fm": 3.83}, {"nome": "Sarr A.", "squadra": "Verona", "ruolo": "A", "pgv": 22, "mv": 5.7, "fm": 5.66}, {"nome": "Serdar", "squadra": "Verona", "ruolo": "C", "pgv": 17, "mv": 6.0, "fm": 6.29}, {"nome": "Slotsager", "squadra": "Verona", "ruolo": "D", "pgv": 4, "mv": 5.62, "fm": 5.62}, {"nome": "Suslov", "squadra": "Verona", "ruolo": "C", "pgv": 0, "mv": 0.0, "fm": 0.0}, {"nome": "Toniolo", "squadra": "Verona", "ruolo": "P", "pgv": 0, "mv": 0.0, "fm": 0.0}, {"nome": "Valentini N.", "squadra": "Verona", "ruolo": "D", "pgv": 11, "mv": 5.68, "fm": 5.59}];
+
+    const state = {
+      q: "",
+      roles: new Set(["P","D","C","A"]),
+      pgvMin: null,
+      pgvMax: null,
+      mvMin: null,
+      mvMax: null,
+      sortKey: null,
+      sortDir: 1, // 1 asc, -1 desc
+    };
+
+    const el = {
+      datasetCount: document.getElementById("datasetCount"),
+      shownCount: document.getElementById("shownCount"),
+      sortState: document.getElementById("sortState"),
+      q: document.getElementById("q"),
+      pgvMin: document.getElementById("pgvMin"),
+      pgvMax: document.getElementById("pgvMax"),
+      mvMin: document.getElementById("mvMin"),
+      mvMax: document.getElementById("mvMax"),
+      tbody: document.getElementById("tbody"),
+      resetBtn: document.getElementById("resetBtn"),
+      downloadBtn: document.getElementById("downloadBtn"),
+      roleChips: document.getElementById("roleChips"),
+      table: document.getElementById("tbl"),
+    };
+
+    function norm(s){ return (s ?? "").toString().trim().toLowerCase(); }
+
+    function parseNum(v){
+      if (v === "" || v === null || v === undefined) return null;
+      const n = Number(v);
+      return Number.isFinite(n) ? n : null;
+    }
+
+    function passesFilters(row){
+      if (!state.roles.has(row.ruolo)) return false;
+
+      if (state.q){
+        const hay = norm(row.nome) + " " + norm(row.squadra);
+        if (!hay.includes(state.q)) return false;
+      }
+
+      if (state.pgvMin !== null && row.pgv < state.pgvMin) return false;
+      if (state.pgvMax !== null && row.pgv > state.pgvMax) return false;
+
+      if (state.mvMin !== null && row.mv < state.mvMin) return false;
+      if (state.mvMax !== null && row.mv > state.mvMax) return false;
+
+      return true;
+    }
+
+    function compare(a,b,key){
+      const va = a[key];
+      const vb = b[key];
+      if (typeof va === "string" || typeof vb === "string"){
+        return norm(va).localeCompare(norm(vb), "it");
+      }
+      return (va ?? 0) - (vb ?? 0);
+    }
+
+    function applySort(rows){
+      if (!state.sortKey) return rows;
+      const key = state.sortKey;
+      const dir = state.sortDir;
+      return [...rows].sort((a,b) => dir * compare(a,b,key));
+    }
+
+    function render(){
+      el.datasetCount.textContent = DATA.length.toString();
+
+      let rows = DATA.filter(passesFilters);
+      rows = applySort(rows);
+
+      el.shownCount.textContent = rows.length.toString();
+
+      el.tbody.innerHTML = rows.map(r => {
+        const roleClass = "roleBadge role-" + r.ruolo;
+        const mv = (r.mv ?? 0).toFixed(2);
+        const fm = (r.fm ?? 0).toFixed(2);
+        return `
+          <tr>
+            <td><span class="${roleClass}">${r.ruolo}</span></td>
+            <td>
+              <div class="nameCell">
+                <div><strong>${r.nome}</strong></div>
+                <div class="sub">${r.squadra}</div>
+              </div>
+            </td>
+            <td class="num">${r.pgv}</td>
+            <td class="num">${mv}</td>
+            <td class="num">${fm}</td>
+          </tr>
+        `;
+      }).join("");
+
+      ["ruolo","nome","pgv","mv","fm"].forEach(k => {
+        const h = document.getElementById("h_" + k);
+        if (!h) return;
+        if (state.sortKey !== k) h.textContent = "";
+        else h.textContent = state.sortDir === 1 ? "▲" : "▼";
+      });
+
+      el.sortState.textContent = state.sortKey ? `${state.sortKey} ${state.sortDir===1 ? "asc" : "desc"}` : "Nessuno";
+    }
+
+    function reset(){
+      state.q = "";
+      state.roles = new Set(["P","D","C","A"]);
+      state.pgvMin = null;
+      state.pgvMax = null;
+      state.mvMin = null;
+      state.mvMax = null;
+      state.sortKey = null;
+      state.sortDir = 1;
+
+      el.q.value = "";
+      el.pgvMin.value = "";
+      el.pgvMax.value = "";
+      el.mvMin.value = "";
+      el.mvMax.value = "";
+
+      [...el.roleChips.querySelectorAll(".chip")].forEach(ch => ch.dataset.on = "true");
+      render();
+    }
+
+    function downloadCSV(){
+      let rows = DATA.filter(passesFilters);
+      rows = applySort(rows);
+
+      const headers = ["ruolo","nome","squadra","pgv","mv","fm"];
+      const lines = [headers.join(",")];
+
+      for (const r of rows){
+        const vals = headers.map(h => {
+          const v = r[h];
+          const s = (v === null || v === undefined) ? "" : v.toString();
+          const escaped = s.replaceAll('"','""');
+          return `"${escaped}"`;
+        });
+        lines.push(vals.join(","));
+      }
+
+      const blob = new Blob([lines.join("\n")], { type: "text/csv;charset=utf-8" });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = "svincolati_fagiolino.csv";
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      URL.revokeObjectURL(url);
+    }
+
+    el.q.addEventListener("input", (e) => {
+      state.q = norm(e.target.value);
+      render();
+    });
+
+    [el.pgvMin, el.pgvMax, el.mvMin, el.mvMax].forEach(inp => {
+      inp.addEventListener("input", () => {
+        state.pgvMin = parseNum(el.pgvMin.value);
+        state.pgvMax = parseNum(el.pgvMax.value);
+        state.mvMin = parseNum(el.mvMin.value);
+        state.mvMax = parseNum(el.mvMax.value);
+        render();
+      });
+    });
+
+    el.resetBtn.addEventListener("click", reset);
+    el.downloadBtn.addEventListener("click", downloadCSV);
+
+    el.roleChips.addEventListener("click", (e) => {
+      const chip = e.target.closest(".chip");
+      if (!chip) return;
+      const role = chip.dataset.role;
+      const on = chip.dataset.on === "true";
+      chip.dataset.on = (!on).toString();
+      if (on) state.roles.delete(role);
+      else state.roles.add(role);
+      render();
+    });
+
+    el.table.querySelectorAll("thead th").forEach(th => {
+      th.addEventListener("click", () => {
+        const key = th.dataset.key;
+        if (!key) return;
+        if (state.sortKey === key) state.sortDir *= -1;
+        else { state.sortKey = key; state.sortDir = 1; }
+        render();
+      });
+    });
+
+    render();
+  </script>
+</body>
+</html>
